@@ -1,0 +1,1 @@
+﻿global using static BlazorApp2.Shared.Logic.SharedValues;

@@ -1,0 +1,10 @@
+﻿global using BlazorApp2.Server.Logic;
+global using BlazorApp2.Server.WebService;
+global using BlazorApp2.Shared.DAO;
+global using BlazorApp2.Shared.Model;
+global using BlazorApp2.Shared;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.EntityFrameworkCore;
+global using System.Text.Json.Serialization;
+global using System.Text.Json;
+global using static BlazorApp2.Server.Logic.Values;
