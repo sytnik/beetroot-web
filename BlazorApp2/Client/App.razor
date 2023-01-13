@@ -1,0 +1,33 @@
+﻿@using BlazorApp2.Client.Logic
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="@OnNavigateAsync">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code{
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        var auth = await Js.GetItemAsync<string>("isauthenticated");
+        var user = (await (_authStateProvider as CustomAuthStateProvider)?
+            .GetAuthenticationStateAsync()!).User;
+        if (!string.IsNullOrEmpty(auth) && user.Identity is {IsAuthenticated: false})
+        {
+            var manager = await Http.GetFromJsonAsync<Manager>("getmanager");
+            if (manager is not null)
+                (_authStateProvider as CustomAuthStateProvider)?.SetAuthInfo(manager);
+            else await Js.RemoveItemAsync("isauthenticated");
+        }
+    }
+
+}
