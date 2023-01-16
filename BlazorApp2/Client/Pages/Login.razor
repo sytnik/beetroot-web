@@ -1,0 +1,31 @@
+﻿@page "/Login"
+@using BlazorApp2.Client.Logic
+<h3>Login</h3>
+<div class="col-md-6 m-auto">
+    <div class="mb-3">
+        <label class="form-label">Login</label>
+        <input type="text" class="form-control"
+               @bind="@_auth.Login" @oninput="@(args => _auth.Login = args.Value?.ToString())"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="text" class="form-control"
+               @bind="@_auth.Password" @oninput="@(args => _auth.Password = args.Value?.ToString())"/>
+    </div>
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" @onclick="LoginTask">Add user</button>
+    </div>
+</div>
+
+
+@code {
+    readonly AuthModel _auth = new();
+
+    async Task LoginTask()
+    {
+        var response = await Http.PostAsJsonAsync("login", _auth);
+        if (response.IsSuccessStatusCode) await Js.SetItemAsync("isauthenticated", "true");
+        Nav.NavigateTo("/");
+    }
+
+}

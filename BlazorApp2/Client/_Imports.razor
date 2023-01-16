@@ -1,14 +1,17 @@
-﻿@using System.Net.Http
-@using System.Net.Http.Json
+﻿@inject AuthenticationStateProvider _authStateProvider
+@inject HttpClient Http
+@inject IJSRuntime Js
+@inject NavigationManager Nav
+@using BlazorApp2.Client
+@using BlazorApp2.Client.Shared
+@using BlazorApp2.Shared.DAO
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
 @using Microsoft.JSInterop
-@using BlazorApp2.Client
-@using BlazorApp2.Client.Shared
-@using BlazorApp2.Shared.DAO
-@inject HttpClient Http
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authorization
+@using System.Net.Http
+@using System.Net.Http.Json

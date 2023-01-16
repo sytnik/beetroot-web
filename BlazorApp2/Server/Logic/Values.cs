@@ -1,8 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.Data.SqlClient;
-
-namespace BlazorApp2.Server.Logic;
+﻿namespace BlazorApp2.Server.Logic;
 
 public static class Values
 {
