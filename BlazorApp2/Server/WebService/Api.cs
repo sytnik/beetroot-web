@@ -4,29 +4,29 @@ public static class Api
 {
     internal static void SetMappings(this WebApplication application)
     {
-        application.MapGet("department", async (ICompanyRepository company) =>
+        application.MapGet("department", async (CompanyRepository company) =>
             JsonSerializer.Serialize(await company.GetDepartmentAsync(), SerializerOptions));
-        application.MapGet("users", async (ICompanyRepository company) =>
+        application.MapGet("users", async (CompanyRepository company) =>
             await company.GetUsersAsync());
-        application.MapPut("createuser", async (UserModel user, ICompanyRepository company) =>
+        application.MapPut("createuser", async (UserModel user, CompanyRepository company) =>
             await company.CreateUserAsync(user) ? Results.Ok(user) : Results.BadRequest(user));
-        application.MapGet("readuser", async (int id, ICompanyRepository company) =>
+        application.MapGet("readuser", async (int id, CompanyRepository company) =>
         {
             var user = await company.ReadUserAsync(id);
             return user is not null ? Results.Ok(user) : Results.NotFound(id);
         });
-        application.MapPatch("updateuser", async (UserModel user, ICompanyRepository company) =>
+        application.MapPatch("updateuser", async (UserModel user, CompanyRepository company) =>
             Results.Created($"https://localhost/readuser?id={user.Id}", await company.UpdateUserAsync(user)));
-        application.MapDelete("deleteuser", async (int id, ICompanyRepository company) =>
+        application.MapDelete("deleteuser", async (int id, CompanyRepository company) =>
             Results.Ok(await company.DeleteUserAsync(id)));
         application.MapPost("/login",
-            async (HttpContext httpContext, AuthModel auth, IDbContextFactory<NewDbContext> factory) =>
+            async (HttpContext httpContext, AuthModel auth, NewDbContext dbContext) =>
             {
-                await httpContext.AuthHandler(auth, factory);
+                await httpContext.AuthHandler(auth, dbContext);
                 httpContext.Response.Redirect("/");
             });
-        application.MapGet("/getmanager", async (HttpContext httpContext, IDbContextFactory<NewDbContext> factory) =>
-            await httpContext.GetManager(factory)
+        application.MapGet("/getmanager", async (HttpContext httpContext, NewDbContext dbContext) =>
+            await httpContext.GetManager(dbContext)
         );
         application.MapGet("/logout", async httpContext => await httpContext.SignOutAsync());
     }

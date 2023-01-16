@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using BlazorApp2.Client.Logic
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
     <Authorized>
@@ -16,7 +15,7 @@
             <div class="mb-3">
                 <label class="form-label">Id is @_currentUser.Id</label>
                 <input type="number" class="form-control"
-                       @bind="@_currentUser.Id" @oninput="@(e => _currentUser.Id = int.Parse(e.Value?.ToString()!))"/>
+                       @bind="@_currentUser.Id" @oninput="@(e => _currentUser.Id = !string.IsNullOrWhiteSpace(e.Value?.ToString()) ? int.Parse(e.Value?.ToString()!) : _currentUser.Id)"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">FirstName</label>
@@ -38,6 +37,7 @@
                 <input type="number" class="form-control"
                        @bind="@_currentUser.DepartmentId" @oninput="@(e => _currentUser.DepartmentId = int.Parse(e.Value?.ToString()!))"/>
             </div>
+            <h3>@_state</h3>
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" @onclick="AddUser">Add user</button>
             </div>
@@ -49,74 +49,5 @@
             </div>
         </div>
     </AuthorizeView>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">@IndexTableHeaders[0]</th>
-                <th scope="col">@IndexTableHeaders[1]</th>
-                <th scope="col">@IndexTableHeaders[2]</th>
-                <th scope="col">@IndexTableHeaders[3]</th>
-                <th scope="col">@IndexTableHeaders[4]</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var user in _users ?? Enumerable.Empty<User>())
-            {
-                <tr @onclick="() => SelectUser(user)">
-                    <td>@user.Id</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                    <td>@user.Info</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => DeleteUser(user.Id)">Delete User</button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+    <UserTable Users="@_users"/>
 </div>
-
-@code
-{
-    List<User> _users;
-    User _currentUser = new();
-
-    protected override async Task OnInitializedAsync() => _users = await GetUsers();
-
-    private async Task<List<User>> GetUsers() => await Http.GetFromJsonAsync<List<User>>("users");
-
-    async Task AddUser()
-    {
-        await Http.PutAsJsonAsync("createuser", _currentUser);
-        _users = await GetUsers();
-    }
-
-    async Task EditUser()
-    {
-        await Http.PatchAsJsonAsync("updateuser", _currentUser);
-        _users = await GetUsers();
-    }
-
-    void SelectUser(User user) => _currentUser = user;
-
-    async Task DeleteUser(int id)
-    {
-        await Http.DeleteAsync($"deleteuser?id={id}");
-        _users = await GetUsers();
-    }
-
-    void AddInfo() => _currentUser.Info += "button clicked!";
-
-    async Task LogoutHandler()
-    {
-        var status = await Http.GetAsync("logout");
-        if (status.IsSuccessStatusCode)
-        {
-            (_authStateProvider as CustomAuthStateProvider).RemoveAuth();
-            await Js.RemoveItemAsync("isauthenticated");
-            Nav.NavigateTo("/");
-        }
-    }
-}
