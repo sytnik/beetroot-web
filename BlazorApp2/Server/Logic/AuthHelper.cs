@@ -3,9 +3,9 @@
 public static class AuthHelper
 {
     public static async Task AuthHandler(this HttpContext context, AuthModel auth,
-        IDbContextFactory<NewDbContext> factory)
+        NewDbContext dbContext)
     {
-        var user = await (await factory.Set<Manager>())
+        var user = await dbContext.Set<Manager>()
             .Where(manager => manager.Login == auth.Login && manager.Password == auth.Password)
             .FirstOrDefaultAsync();
         if (user is not null)
@@ -21,10 +21,10 @@ public static class AuthHelper
             );
     }
 
-    public static async Task<Manager> GetManager(this HttpContext context, IDbContextFactory<NewDbContext> factory)
+    public static async Task<Manager> GetManager(this HttpContext context, NewDbContext dbContext)
     {
         var login = context.User.Identity?.Name ?? "";
-        return await (await factory.Set<Manager>())
+        return await dbContext.Set<Manager>()
             .Where(manager => manager.Login == login).FirstOrDefaultAsync();
     }
 }

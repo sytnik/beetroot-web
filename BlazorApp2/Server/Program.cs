@@ -1,9 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddPooledDbContextFactory<NewDbContext>(optionsBuilder =>
-    optionsBuilder.UseSqlServer(
-            ConnectionString, contextOptionsBuilder =>
-                contextOptionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.FirstWithoutOrderByAndFilterWarning)));
+builder.Services.AddDbContext<NewDbContext>(options => options.UseSqlServer(ConnectionString, contextOptionsBuilder =>
+        contextOptionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+    .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.FirstWithoutOrderByAndFilterWarning)));
 builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>().AddEndpointsApiExplorer().AddSwaggerGen();
@@ -17,8 +15,7 @@ app.UseSwagger().UseSwaggerUI(options =>
         options.RoutePrefix = "somehiddentest";
     })
     .UseHttpsRedirection();
-app.UseBlazorFrameworkFiles().UseStaticFiles()
-    .UseRouting()
+app.UseBlazorFrameworkFiles().UseStaticFiles().UseRouting()
     .UseAuthentication().UseAuthorization();
 app.MapRazorPages();
 app.MapFallbackToFile("index.html");

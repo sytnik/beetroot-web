@@ -20,13 +20,13 @@ public static class Api
         application.MapDelete("deleteuser", async (int id, ICompanyRepository company) =>
             Results.Ok(await company.DeleteUserAsync(id)));
         application.MapPost("/login",
-            async (HttpContext httpContext, AuthModel auth, IDbContextFactory<NewDbContext> factory) =>
+            async (HttpContext httpContext, AuthModel auth, NewDbContext dbContext) =>
             {
-                await httpContext.AuthHandler(auth, factory);
+                await httpContext.AuthHandler(auth, dbContext);
                 httpContext.Response.Redirect("/");
             });
-        application.MapGet("/getmanager", async (HttpContext httpContext, IDbContextFactory<NewDbContext> factory) =>
-            await httpContext.GetManager(factory)
+        application.MapGet("/getmanager", async (HttpContext httpContext, NewDbContext dbContext) =>
+            await httpContext.GetManager(dbContext)
         );
         application.MapGet("/logout", async httpContext => await httpContext.SignOutAsync());
     }
