@@ -1,6 +1,6 @@
 ﻿namespace BlazorApp2.Server.WebService;
 
-public class CompanyRepository : ICompanyRepository
+public class CompanyRepository
 {
     private readonly NewDbContext _dbContext;
     public CompanyRepository(NewDbContext dbContext) => _dbContext = dbContext;

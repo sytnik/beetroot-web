@@ -4,7 +4,8 @@ builder.Services.AddDbContext<NewDbContext>(options => options.UseSqlServer(Conn
     .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.FirstWithoutOrderByAndFilterWarning)));
 builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
-builder.Services.AddScoped<ICompanyRepository, CompanyRepository>().AddEndpointsApiExplorer().AddSwaggerGen();
+builder.Services.AddScoped<CompanyRepository>();
+builder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 builder.Services.AddRazorPages();
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) app.UseWebAssemblyDebugging();
