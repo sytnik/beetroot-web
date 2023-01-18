@@ -16,7 +16,7 @@
             <div class="mb-3">
                 <label class="form-label">Id is @_currentUser.Id</label>
                 <input type="number" class="form-control"
-                       @bind="@_currentUser.Id" @oninput="@(e => _currentUser.Id = int.Parse(e.Value?.ToString()!))"/>
+                       @bind="@_currentUser.Id" @oninput="@(e => _currentUser.Id = !string.IsNullOrWhiteSpace(e.Value?.ToString()) ? int.Parse(e.Value?.ToString()!) : _currentUser.Id)"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">FirstName</label>
@@ -38,6 +38,7 @@
                 <input type="number" class="form-control"
                        @bind="@_currentUser.DepartmentId" @oninput="@(e => _currentUser.DepartmentId = int.Parse(e.Value?.ToString()!))"/>
             </div>
+            <h3>@_state</h3>
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" @onclick="AddUser">Add user</button>
             </div>
@@ -69,7 +70,7 @@
                     <td>@user.LastName</td>
                     <td>@user.Info</td>
                     <td>
-                        <button class="btn btn-primary" @onclick="() => DeleteUser(user.Id)">Delete User</button>
+                        <button class="btn btn-primary" @onclick="() => DeleteUser(user)">Delete User</button>
                     </td>
                 </tr>
             }
@@ -82,6 +83,7 @@
 {
     List<User> _users;
     User _currentUser = new();
+    string _state = "Please input user data";
 
     protected override async Task OnInitializedAsync() => _users = await GetUsers();
 
@@ -89,7 +91,21 @@
 
     async Task AddUser()
     {
-        await Http.PutAsJsonAsync("createuser", _currentUser);
+        var isValid = true;
+        if (_currentUser.Id < 1)
+        {
+            _state = "Id is not valid";
+            isValid = false;
+        }
+        if (string.IsNullOrWhiteSpace(_currentUser.FirstName))
+        {
+            _state = "FirstName is not valid";
+            isValid = false;
+        }
+        if (!isValid) return;
+        var result = await Http.PutAsJsonAsync("createuser", _currentUser);
+        _state = result.IsSuccessStatusCode ? "User added" : "User add error";
+        if (!result.IsSuccessStatusCode) return;
         _users = await GetUsers();
     }
 
@@ -101,9 +117,10 @@
 
     void SelectUser(User user) => _currentUser = user;
 
-    async Task DeleteUser(int id)
+    async Task DeleteUser(User user)
     {
-        await Http.DeleteAsync($"deleteuser?id={id}");
+        if(!await Js.InvokeAsync<bool>("confirm", $"Are you sure to delete {user.FullName}?")) return;
+        await Http.DeleteAsync($"deleteuser?id={user.Id}");
         _users = await GetUsers();
     }
 
