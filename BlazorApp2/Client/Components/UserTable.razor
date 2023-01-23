@@ -1,0 +1,27 @@
+﻿    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">@IndexTableHeaders[0]</th>
+                <th scope="col">@IndexTableHeaders[1]</th>
+                <th scope="col">@IndexTableHeaders[2]</th>
+                <th scope="col">@IndexTableHeaders[3]</th>
+                <th scope="col">@IndexTableHeaders[4]</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Users ?? Enumerable.Empty<User>())
+            {
+                <tr @onclick="() => SelectUser(user)">
+                    <td>@user.Id</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Info</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => DeleteUser(user)">Delete User</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>

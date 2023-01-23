@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using BlazorApp2.Client.Logic
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
     <Authorized>
@@ -50,90 +49,5 @@
             </div>
         </div>
     </AuthorizeView>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">@IndexTableHeaders[0]</th>
-                <th scope="col">@IndexTableHeaders[1]</th>
-                <th scope="col">@IndexTableHeaders[2]</th>
-                <th scope="col">@IndexTableHeaders[3]</th>
-                <th scope="col">@IndexTableHeaders[4]</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var user in _users ?? Enumerable.Empty<User>())
-            {
-                <tr @onclick="() => SelectUser(user)">
-                    <td>@user.Id</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                    <td>@user.Info</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => DeleteUser(user)">Delete User</button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+    <UserTable Users="@_users"/>
 </div>
-
-@code
-{
-    List<User> _users;
-    User _currentUser = new();
-    string _state = "Please input user data";
-
-    protected override async Task OnInitializedAsync() => _users = await GetUsers();
-
-    private async Task<List<User>> GetUsers() => await Http.GetFromJsonAsync<List<User>>("users");
-
-    async Task AddUser()
-    {
-        var isValid = true;
-        if (_currentUser.Id < 1)
-        {
-            _state = "Id is not valid";
-            isValid = false;
-        }
-        if (string.IsNullOrWhiteSpace(_currentUser.FirstName))
-        {
-            _state = "FirstName is not valid";
-            isValid = false;
-        }
-        if (!isValid) return;
-        var result = await Http.PutAsJsonAsync("createuser", _currentUser);
-        _state = result.IsSuccessStatusCode ? "User added" : "User add error";
-        if (!result.IsSuccessStatusCode) return;
-        _users = await GetUsers();
-    }
-
-    async Task EditUser()
-    {
-        await Http.PatchAsJsonAsync("updateuser", _currentUser);
-        _users = await GetUsers();
-    }
-
-    void SelectUser(User user) => _currentUser = user;
-
-    async Task DeleteUser(User user)
-    {
-        if(!await Js.InvokeAsync<bool>("confirm", $"Are you sure to delete {user.FullName}?")) return;
-        await Http.DeleteAsync($"deleteuser?id={user.Id}");
-        _users = await GetUsers();
-    }
-
-    void AddInfo() => _currentUser.Info += "button clicked!";
-
-    async Task LogoutHandler()
-    {
-        var status = await Http.GetAsync("logout");
-        if (status.IsSuccessStatusCode)
-        {
-            (_authStateProvider as CustomAuthStateProvider).RemoveAuth();
-            await Js.RemoveItemAsync("isauthenticated");
-            Nav.NavigateTo("/");
-        }
-    }
-}
