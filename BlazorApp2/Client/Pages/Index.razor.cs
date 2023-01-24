@@ -5,10 +5,15 @@ namespace BlazorApp2.Client.Pages;
 public sealed partial class Index
 {
     private List<User> _users;
+    private Department _department;
     private User _currentUser = new();
     private string _state = "Please input user data";
 
-    protected override async Task OnInitializedAsync() => _users = await GetUsers();
+    protected override async Task OnInitializedAsync()
+    {
+        _department = await Http.GetFromJsonAsync<Department>("GetDepartmentWithCounter");
+        _users = await GetUsers();
+    }
 
     private async Task<List<User>> GetUsers() => await Http.GetFromJsonAsync<List<User>>("users");
 

@@ -27,4 +27,22 @@ public static class AuthHelper
         return await dbContext.Set<Manager>()
             .Where(manager => manager.Login == login).FirstOrDefaultAsync();
     }
+
+    public static async Task<Manager> GetManagerWithData(this HttpContext context, int Id, NewDbContext dbContext)
+    {
+        var managerWithData = await dbContext.Manager.Include(manager => manager.Purchases)
+            .ThenInclude(purchase => purchase.PurchaseProducts)
+            .ThenInclude(product => product.Product).FirstAsync(manager => manager.Id == Id);
+        return managerWithData;
+    }
+    
+    public static async Task<List<Product>> GetAllProducts(this HttpContext context, NewDbContext dbContext)
+    {
+        return await dbContext.Product.ToListAsync();
+    }
+    
+    public static async Task<int> GetNewPurchaseId(this HttpContext context, NewDbContext dbContext)
+    {
+        return await dbContext.Purchase.MaxAsync(p=>p.Id) + 1;
+    }
 }
