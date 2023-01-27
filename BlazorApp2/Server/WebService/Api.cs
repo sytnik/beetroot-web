@@ -28,6 +28,17 @@ public static class Api
         application.MapGet("/getmanager", async (HttpContext httpContext, NewDbContext dbContext) =>
             await httpContext.GetManager(dbContext)
         );
+        application.MapGet("/getmanagerwithdata", async (int id, HttpContext httpContext, NewDbContext dbContext) =>
+        {
+            var manager = await httpContext.GetManagerWithData(id, dbContext);
+            return JsonSerializer.Serialize(manager, SerializerOptions);
+        });
+        application.MapGet("/getallproducts", async (HttpContext httpContext, NewDbContext dbContext) =>
+            await httpContext.GetAllProducts(dbContext)
+        );
+        application.MapGet("/GetNewPurchaseId", async (HttpContext httpContext, NewDbContext dbContext) =>
+            await httpContext.GetNewPurchaseId(dbContext)
+        );
         application.MapGet("/logout", async httpContext => await httpContext.SignOutAsync());
     }
 }
