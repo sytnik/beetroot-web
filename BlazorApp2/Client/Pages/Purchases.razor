@@ -1,78 +1,56 @@
 ﻿@page "/Purchases"
 @using BlazorApp2.Server.Logic
-<h3>Create new purchase</h3>
+<h3>Customer: @_manager?.Login (@_manager?.Role)</h3>
 <div class="col-md-6 m-auto">
-    @foreach (var purchaseProduct in _purchase.PurchaseProducts ?? Enumerable.Empty<PurchaseProduct>())
+    <h3>Create new purchase</h3>
+    <table class="table">
+        <tr>
+            <td>Product</td>
+            <td>Count</td>
+            <td>Total</td>
+        </tr>
+        @foreach (var purchaseProduct in _purchase.PurchaseProducts ?? Enumerable.Empty<PurchaseProduct>())
+        {
+            <tr>
+                <td>
+                    @purchaseProduct.Product.Name (@purchaseProduct.Product.Price)
+                </td>
+                <td>
+                    <input class="form-control" type="number" min="0" max="100" @bind="@purchaseProduct.Counter"
+                           @oninput="@(e => purchaseProduct.Counter = !string.IsNullOrWhiteSpace(e.Value?.ToString()) ? int.Parse(e.Value?.ToString()!) : purchaseProduct.Counter)"/>
+                </td>
+                <td class="text-end">
+                    @(purchaseProduct.Counter * purchaseProduct.Product.Price)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2">
+                <button type="button" class="btn btn-primary text-black"
+                        @onclick="OnSubmitPurchase">
+                    Submit the purchase
+                </button>
+            </td>
+            <td class="text-end">
+                @_amount
+            </td>
+        </tr>
+    </table>
+    <h3>Purchase history</h3>
+    @if (_manager is not null)
     {
-        <div class="row">
-            <div class="col-md-4">
-                @purchaseProduct.Product.Name (@purchaseProduct.Product.Price)
-            </div>
-            <div class="col-md-4">
-                <input type="number" min="0" max="100" @bind="@purchaseProduct.Counter"
-                       @oninput="@(e => purchaseProduct.Counter = 
-                                     !string.IsNullOrWhiteSpace(e.Value?.ToString()) ?
-                                         int.Parse(e.Value?.ToString()!) : purchaseProduct.Counter)"/>
-            </div>
-            <div class="col-md-4">
-                @(purchaseProduct.Counter * purchaseProduct.Product.Price)
-            </div>
-        </div>
+        foreach (var purhase in _manager.Purchases)
+        {
+            <p>Purchase @purhase.Id:</p>
+            foreach (var purchaseProduct in purhase.PurchaseProducts)
+            {
+                <p>@purchaseProduct.Product.Name x @purchaseProduct.Counter = @(purchaseProduct.Product.Price * purchaseProduct.Counter)</p>
+            }
+            <p>Purchase amount: @CalculateAmount(purhase)</p>
+            <button type="button" class="btn btn-primary text-black"
+                    @onclick="() => OnDeletePurchase(purhase.Id)">
+                Delete the purchase
+            </button>
+        }
     }
-    <p>Amount:@_amount</p>
-    <button>Submit the purchase</button>
 </div>
-
-<h3>Purchases</h3>
-@if (_manager is not null)
-{
-    <h3>Customer: @_manager.Login (@_manager.Role)</h3>
-    foreach (var purhase in _manager.Purchases)
-    {
-        <p>Purchase @purhase.Id :</p>
-        foreach (var purchaseProduct in purhase.PurchaseProducts)
-        {
-            <p>@purchaseProduct.Product.Name x @purchaseProduct.Counter = @(purchaseProduct.Product.Price * purchaseProduct.Counter)</p>
-        }
-    }
-}
-
-@code {
-
-    Manager _manager;
-    List<Product> _allProducts;
-    Purchase _purchase = new Purchase();
-    decimal _amount
-    {
-        get
-        {
-            decimal sum = 0;
-            if(_manager is not null && _purchase is not null)
-                foreach (var purchaseProduct in _purchase.PurchaseProducts)
-                    sum += purchaseProduct.Product.Price * purchaseProduct.Counter;
-            return sum;
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _allProducts = await Http.GetFromJsonAsync<List<Product>>("getallproducts");
-        var manager = await Http.GetFromJsonAsync<Manager>("getmanager");
-        if (manager is not null)
-        {
-            _manager = await Http.GetFromJsonAsync<Manager>($"getmanagerwithdata?id={manager.Id}");
-        }
-        _purchase = new Purchase
-        {
-            Id = await Http.GetFromJsonAsync<int>("GetNewPurchaseId"), ManagerId = _manager.Id,
-            PurchaseProducts = new List<PurchaseProduct>()
-        };
-        foreach (var product in _allProducts)
-        {
-            _purchase.PurchaseProducts.Add(new PurchaseProduct
-            {PurchaseId = _purchase.Id, ProductId = product.Id, Counter = 0, Product = product});
-        }
-
-    }
-
-}

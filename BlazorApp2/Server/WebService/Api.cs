@@ -1,4 +1,6 @@
-﻿namespace BlazorApp2.Server.WebService;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace BlazorApp2.Server.WebService;
 
 public static class Api
 {
@@ -7,7 +9,7 @@ public static class Api
         application.MapGet("department", async (CompanyRepository company) =>
             JsonSerializer.Serialize(await company.GetDepartmentAsync(), SerializerOptions));
         application.MapGet("users", async (CompanyRepository company) =>
-            await company.GetUsersAsync());
+            JsonSerializer.Serialize(await company.GetUsersAsync(), SerializerOptions));
         application.MapPut("createuser", async (UserModel user, CompanyRepository company) =>
             await company.CreateUserAsync(user) ? Results.Ok(user) : Results.BadRequest(user));
         application.MapGet("readuser", async (int id, CompanyRepository company) =>
@@ -39,6 +41,15 @@ public static class Api
         application.MapGet("/GetNewPurchaseId", async (HttpContext httpContext, NewDbContext dbContext) =>
             await httpContext.GetNewPurchaseId(dbContext)
         );
+
+        application.MapPost("SubmitPurchase",
+            async (CompanyRepository companyRepository, [FromBody] Purchase purchase) =>
+                await companyRepository.SubmitPurchase(purchase));
+        application.MapDelete("DeletePurchase",
+            (CompanyRepository companyRepository, int id) => companyRepository.DeletePurchase(id));
+
+        application.MapGet("/GetDepartmentWithCounter", async (CompanyRepository company) =>
+            JsonSerializer.Serialize(await company.GetDepartmentWithCounter(), SerializerOptions));
         application.MapGet("/logout", async httpContext => await httpContext.SignOutAsync());
     }
 }

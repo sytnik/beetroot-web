@@ -1,9 +1,43 @@
-﻿namespace BlazorApp2.Server.WebService;
+﻿using EFCore.BulkExtensions;
+
+namespace BlazorApp2.Server.WebService;
 
 public class CompanyRepository
 {
     private readonly NewDbContext _dbContext;
     public CompanyRepository(NewDbContext dbContext) => _dbContext = dbContext;
+
+    public async Task SubmitPurchase(Purchase purchase)
+    {
+        // save the main purchase
+        await _dbContext.BulkInsertAsync(new List<Purchase> {purchase});
+        // save m2m entities
+        await _dbContext.BulkInsertAsync(purchase.PurchaseProducts);
+    }
+
+    public async Task DeletePurchase(int purchaseId)
+    {
+        // delete purchase by id
+        await _dbContext.BulkDeleteAsync(new List<Purchase>
+            {await _dbContext.Purchase.FirstAsync(purchase => purchase.Id == purchaseId)});
+        // delete binding entities with this id
+        await _dbContext.BulkDeleteAsync(await _dbContext.PurchaseProduct
+            .Where(purchaseProduct => purchaseProduct.PurchaseId == purchaseId).ToListAsync());
+    }
+
+    public async Task<Department> GetDepartmentWithCounter()
+    {
+        // var department = await _dbContext.Department.Include(d => d.Users).FirstAsync();
+        // department.UserCounter = department.Users.Count;
+        // department.Users = null;
+        // return department;
+        var department = await _dbContext.Department.FirstAsync();
+        return department with
+        {
+            UserCounter =
+            await _dbContext.Users.CountAsync(user => user.DepartmentId == department.Id)
+        };
+    }
 
     public async Task<Department> GetDepartmentAsync() =>
         await _dbContext.Set<Department>().Include(department => department.Users)
