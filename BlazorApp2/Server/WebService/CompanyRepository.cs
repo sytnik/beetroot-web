@@ -1,11 +1,38 @@
-﻿using EFCore.BulkExtensions;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using EFCore.BulkExtensions;
 
 namespace BlazorApp2.Server.WebService;
 
 public class CompanyRepository
 {
     private readonly NewDbContext _dbContext;
-    public CompanyRepository(NewDbContext dbContext) => _dbContext = dbContext;
+    private readonly ILogger<CompanyRepository> _log;
+    private readonly IMapper _mapper;
+
+    public CompanyRepository(NewDbContext dbContext, ILogger<CompanyRepository> log, IMapper mapper)
+    {
+        _log = log;
+        _dbContext = dbContext;
+        _mapper = mapper;
+    }
+
+    public async Task<DepartmentDto> GetDepartmentWithUsers()
+    {
+        // var department = await _dbContext.Department.FirstAsync();
+        // var userDtos = await _dbContext.Users.Where(u => u.DepartmentId == department.Id)
+        //     .Select(user => new UserDto(user.Id, user.FirstName, user.LastName, user.Info)).ToListAsync();
+        // return new DepartmentDto(department.Name, userDtos);
+        var watch = new System.Diagnostics.Stopwatch();
+        watch.Start();
+        var department = await _mapper.ProjectTo<DepartmentDto>
+            (_dbContext.Department).FirstAsync();
+        watch.Stop();
+        // var users = _dbContext.Users.Where(u => u.Id > 5)
+        //     .Include(u=>u.Department);
+        _log.LogCritical($"Execution Time: {watch.ElapsedMilliseconds} ms");
+        return department;
+    }
 
     public async Task SubmitPurchase(Purchase purchase)
     {

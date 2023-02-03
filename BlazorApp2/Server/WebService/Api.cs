@@ -50,6 +50,10 @@ public static class Api
 
         application.MapGet("/GetDepartmentWithCounter", async (CompanyRepository company) =>
             JsonSerializer.Serialize(await company.GetDepartmentWithCounter(), SerializerOptions));
+        
+        application.MapGet("/GetDepartmentWithUsers", async (CompanyRepository company) =>
+            JsonSerializer.Serialize(await company.GetDepartmentWithUsers(), SerializerOptions));
+        
         application.MapGet("/logout", async httpContext => await httpContext.SignOutAsync());
     }
 }
