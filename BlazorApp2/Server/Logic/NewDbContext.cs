@@ -8,7 +8,7 @@ public class NewDbContext : DbContext
     public DbSet<Purchase> Purchase { get; set; }
     public DbSet<PurchaseProduct> PurchaseProduct { get; set; }
     public DbSet<Manager> Manager { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> User { get; set; }
 
     public NewDbContext(DbContextOptions<NewDbContext> options) : base(options)
     {

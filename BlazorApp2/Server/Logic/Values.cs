@@ -27,9 +27,9 @@ public static class Values
     // });
 }
 
-public sealed class DepartmentProfile : Profile
+public sealed class AppProfile : Profile
 {
-    public DepartmentProfile()
+    public AppProfile()
     {
         CreateProjection<Department, DepartmentDto>();
         CreateProjection<User, UserDto>();

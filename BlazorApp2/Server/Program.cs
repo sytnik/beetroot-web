@@ -7,8 +7,10 @@ builder.Services.AddDbContext<NewDbContext>(options => options.UseSqlServer(Conn
     .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.FirstWithoutOrderByAndFilterWarning)));
 builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
+// var mapperConfig = new MapperConfiguration(c =>
+//     c.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
 var mapperConfig = new MapperConfiguration(c =>
-    c.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
+    c.AddProfile<AppProfile>());
 var mapper = mapperConfig.CreateMapper();
 mapper.ConfigurationProvider.AssertConfigurationIsValid();
 builder.Services.AddSingleton(mapper);

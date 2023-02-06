@@ -33,6 +33,13 @@ public class CompanyRepository
         _log.LogCritical($"Execution Time: {watch.ElapsedMilliseconds} ms");
         return department;
     }
+    
+    public async Task<DepartmentDto> GetDepartmentWithUsers2()
+    {
+        var department = await _mapper.ProjectTo<DepartmentDto>
+            (_dbContext.Department).FirstAsync();
+        return department;
+    }
 
     public async Task SubmitPurchase(Purchase purchase)
     {
@@ -62,7 +69,7 @@ public class CompanyRepository
         return department with
         {
             UserCounter =
-            await _dbContext.Users.CountAsync(user => user.DepartmentId == department.Id)
+            await _dbContext.User.CountAsync(user => user.DepartmentId == department.Id)
         };
     }
 
