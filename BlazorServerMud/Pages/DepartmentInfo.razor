@@ -1,0 +1,33 @@
+﻿@page "/deparmentinfo"
+@using BlazorServerMud.DAO
+<h1>The department name is @_department?.Name and has @_department?.Users.Count users</h1>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">@IndexTableHeaders[0]</th>
+            <th scope="col">@IndexTableHeaders[1]</th>
+            <th scope="col">@IndexTableHeaders[2]</th>
+            <th scope="col">@IndexTableHeaders[3]</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in _department?.Users ?? Enumerable.Empty<UserDto>())
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+                <td>@user.Info</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private DepartmentDto _department;
+
+    protected override async Task OnInitializedAsync() => _department = await Repository.GetDepartmentWithUsers();
+
+}

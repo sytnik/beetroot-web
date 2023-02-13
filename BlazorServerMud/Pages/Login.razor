@@ -1,0 +1,30 @@
+﻿@page "/Login"
+@using BlazorServerMud.DAO
+<h3>Login</h3>
+<div class="col-md-6 m-auto">
+    <div class="mb-3">
+        <label class="form-label">Login</label>
+        <input type="text" class="form-control"
+               @bind="@_auth.Login" @oninput="@(args => _auth.Login = args.Value?.ToString())"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="text" class="form-control"
+               @bind="@_auth.Password" @oninput="@(args => _auth.Password = args.Value?.ToString())"/>
+    </div>
+    <div class="d-grid gap-2">
+        <a class="btn btn-primary" @onclick="LoginTask">Login</a>
+    </div>
+</div>
+
+
+@code {
+    readonly AuthModel _auth = new();
+
+    async Task LoginTask()
+    {
+        var client = await new HttpClient().PostAsJsonAsync($"{Nav.BaseUri}loginhandler", _auth);
+        Nav.NavigateTo("/loginhandler?l",true,true);
+    }
+
+}

@@ -1,0 +1,19 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+    <MudScrollToTop>
+        <MudFab Icon="@Icons.Material.Filled.ArrowUpward"/>
+    </MudScrollToTop>
+    <MudSnackbarProvider/>
+    <MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Medium" CloseButton="true" DisableBackdropClick="true"
+                       CloseOnEscapeKey="true" Position="DialogPosition.Center"/>
+</CascadingAuthenticationState>

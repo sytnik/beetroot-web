@@ -1,0 +1,54 @@
+﻿@page "/"
+<PageTitle>Index</PageTitle>
+<h1>The department name is @_department?.Name and has @_department?.UserCounter users</h1>
+<AuthorizeView>
+    <Authorized>
+        <a href="">@context.User.Identity?.Name!</a>
+        <a href="/logout" class="nav-link btn btn-link">Log out</a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+<div class="col-md-9 m-auto">
+    <AuthorizeView Roles="Admin">
+        <div class="col-md-6 m-auto">
+            <div class="mb-3">
+                <label class="form-label">Id is @_currentUser.Id</label>
+                <input type="number" class="form-control"
+                       @bind="@_currentUser.Id" @oninput="@(e => _currentUser.Id = !string.IsNullOrWhiteSpace(e.Value?.ToString()) ? int.Parse(e.Value?.ToString()!) : _currentUser.Id)"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">FirstName</label>
+                <input type="text" class="form-control"
+                       @bind="@_currentUser.FirstName" @oninput="@(e => _currentUser.FirstName = e.Value?.ToString())"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">LastName</label>
+                <input type="text" class="form-control"
+                       @bind="@_currentUser.LastName" @oninput="@(e => _currentUser.LastName = e.Value?.ToString())"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Info</label>
+                <textarea class="form-control"
+                   @bind="@_currentUser.Info" @oninput="@(e => _currentUser.Info = e.Value?.ToString())"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">DepartmentId</label>
+                <input type="number" class="form-control"
+                       @bind="@_currentUser.DepartmentId" @oninput="@(e => _currentUser.DepartmentId = int.Parse(e.Value?.ToString()!))"/>
+            </div>
+            <h3>@_state</h3>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" @onclick="AddUser">Add user</button>
+            </div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" @onclick="EditUser">Edit user</button>
+            </div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" @onclick="AddInfo">Add text to info</button>
+            </div>
+        </div>
+    </AuthorizeView>
+    <UserTable Users="@_users"/>
+</div>
